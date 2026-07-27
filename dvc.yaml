@@ -5,8 +5,8 @@ stages:
     - data/raw/data.csv
     - src/preprocess.py
     params:
-    input: 
-    - data/raw/data.csv
+    - preprocess.input
+    - preprocess.output
     outs:
     - data/preprocessed/data.csv
   train:
