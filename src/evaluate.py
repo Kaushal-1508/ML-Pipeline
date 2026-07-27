@@ -7,7 +7,8 @@ import os
 from urllib.parse import urlparse
 import logging
 import dagshub
-import mlflow 
+import mlflow
+import json 
 dagshub.init(repo_owner='Kaushal-1508', repo_name='ML-Pipeline', mlflow=True)
 logging.basicConfig(level=logging.WARN)
 logger = logging.getLogger(__name__)
@@ -27,8 +28,21 @@ def evaluate(data_path, model_path):
     model = pickle.load(open(model_path, 'rb'))
     predictions =  model.predict(X)
     accuracy = accuracy_score(y , predictions)
+    cm = confusion_matrix(y, predictions)
+    cr = classification_report(y, predictions)
 
+    metrics = {
+        "accuracy": accuracy,
+        "confusion_matrix" : cm.tolist(),
+        "classification_report" : cr
+
+    }
+
+    with open("metrics.json", "w") as f:
+        json.dump(metrics, f, indent=4)
     mlflow.log_metric("accuracy", accuracy)
+    mlflow.log_text(str(cm), "confusion_matrix.txt")
+    mlflow.log_text(cr , "classification_report.txt")
     print(f"Model accuracy :{accuracy}")
 
 if __name__=="__main__":
